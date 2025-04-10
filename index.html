@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload - ImgBB & Catbox</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .url-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .url-container input {
+            width: 80%;
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .url-container button {
+            width: 20%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Upload Your Image</h2>
+    <input type="file" id="imageInput">
+    <button onclick="uploadImage()">Upload Image</button>
+
+    <div class="url-container" style="display: none;">
+        <input type="text" id="imageUrl" readonly>
+        <button onclick="copyUrl()">Copy URL</button>
+    </div>
+</div>
+
+<script>
+    const imgbbApiKey = "YOUR_IMGBB_API_KEY"; // Replace with your ImgBB API key
+    const catboxApiUrl = "https://catbox.moe/user/api.php"; // Catbox API endpoint
+
+    function uploadImage() {
+        const imageInput = document.getElementById("imageInput");
+        const file = imageInput.files[0];
+
+        if (!file) {
+            alert("Please select an image to upload.");
+            return;
+        }
+
+        // Randomly choose between ImgBB and Catbox
+        const useImgBB = Math.random() < 0.5;
+
+        if (useImgBB) {
+            uploadToImgBB(file);
+        } else {
+            uploadToCatbox(file);
+        }
+    }
+
+    function uploadToImgBB(file) {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayUrl(data.data.url);
+            } else {
+                alert("Error uploading to ImgBB.");
+            }
+        })
+        .catch(() => alert("Error uploading to ImgBB."));
+    }
+
+    function uploadToCatbox(file) {
+        const formData = new FormData();
+        formData.append("type", "fileupload");
+        formData.append("fileToUpload", file);
+
+        fetch(catboxApiUrl, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.fileurl) {
+                displayUrl(data.fileurl);
+            } else {
+                alert("Error uploading to Catbox.");
+            }
+        })
+        .catch(() => alert("Error uploading to Catbox."));
+    }
+
+    function displayUrl(url) {
+        const urlContainer = document.querySelector(".url-container");
+        const imageUrlInput = document.getElementById("imageUrl");
+        imageUrlInput.value = url;
+        urlContainer.style.display = "flex";
+    }
+
+    function copyUrl() {
+        const imageUrlInput = document.getElementById("imageUrl");
+        imageUrlInput.select();
+        document.execCommand("copy");
+        alert("URL copied to clipboard!");
+    }
+</script>
+
+</body>
+</html>
