@@ -1,98 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Neon Image Uploader</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Uploader</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
       margin: 0;
-      background-color: #0f0f2d;
-      font-family: 'Courier New', monospace;
-      color: #00ffcc;
+      padding: 0;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-top: 30px;
+      color: #00796b;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .container {
-      background: #000000;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #00fff2, 0 0 40px #ff00e6;
-      width: 100%;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      width: 90%;
       max-width: 400px;
-      text-align: center;
-    }
-
-    h2 {
-      color: #00ffe7;
-      text-shadow: 0 0 10px #00ffe7, 0 0 20px #00ffe7;
-      margin-bottom: 20px;
+      margin-top: 20px;
     }
 
     input[type="file"] {
+      width: 100%;
       margin-bottom: 15px;
-      color: white;
     }
 
     button {
-      padding: 10px 20px;
-      background: #00ffcc;
+      padding: 10px 15px;
+      background-color: #00796b;
+      color: white;
       border: none;
-      border-radius: 8px;
-      color: #000;
-      font-weight: bold;
+      border-radius: 5px;
       cursor: pointer;
-      box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
-      transition: 0.3s;
+      width: 100%;
+      font-weight: bold;
     }
 
     button:hover {
-      background: #ff00e6;
-      color: white;
-      box-shadow: 0 0 15px #ff00e6, 0 0 30px #ff00e6;
+      background-color: #004d40;
     }
 
     .url-container {
       margin-top: 20px;
       display: none;
-      flex-direction: row;
+      flex-direction: column;
       gap: 10px;
     }
 
     .url-container input {
-      flex: 1;
       padding: 10px;
-      background: black;
-      color: #00ffcc;
-      border: 1px solid #00ffcc;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #00ffcc;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
     }
 
-    .url-container button {
-      width: auto;
+    .contact-section {
+      margin-top: 40px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .contact-button {
+      background-color: #25D366;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s;
+    }
+
+    .contact-button:hover {
+      background-color: #1ebe5d;
     }
   </style>
 </head>
 <body>
 
+  <h1>Image Upload Website</h1>
+
   <div class="container">
-    <h2>Neon Image Uploader</h2>
-    <input type="file" id="imageInput" />
-    <br>
+    <input type="file" id="imageInput">
     <button onclick="uploadImage()">Upload Image</button>
 
-    <div class="url-container">
-      <input type="text" id="imageUrl" readonly />
-      <button onclick="copyUrl()">Copy</button>
+    <div class="url-container" id="urlContainer">
+      <input type="text" id="imageUrl" readonly>
+      <button onclick="copyUrl()">Copy URL</button>
     </div>
   </div>
 
+  <div class="contact-section">
+    <a href="https://wa.me/8801XXXXXXXXX" target="_blank" class="contact-button">Contact</a>
+  </div>
+
   <script>
-    const imgbbApiKey = "840580f966601975b93b94a01a15e8df"; // Replace with your actual API key
+    const imgbbApiKey = "840580f966601975b93b94a01a15e8df"; // Replace with your ImgBB API key
     const catboxApiUrl = "https://catbox.moe/user/api.php";
 
     function uploadImage() {
@@ -119,17 +135,17 @@
 
       fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
         method: "POST",
-        body: formData,
+        body: formData
       })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          displayUrl(data.data.url);
-        } else {
-          alert("Failed to upload to ImgBB.");
-        }
-      })
-      .catch(() => alert("Error uploading to ImgBB."));
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            displayUrl(data.data.url);
+          } else {
+            alert("Error uploading to ImgBB.");
+          }
+        })
+        .catch(() => alert("Error uploading to ImgBB."));
     }
 
     function uploadToCatbox(file) {
@@ -139,29 +155,29 @@
 
       fetch(catboxApiUrl, {
         method: "POST",
-        body: formData,
+        body: formData
       })
-      .then((res) => res.text())
-      .then((url) => {
-        if (url.startsWith("https://")) {
-          displayUrl(url);
-        } else {
-          alert("Failed to upload to Catbox.");
-        }
-      })
-      .catch(() => alert("Error uploading to Catbox."));
+        .then(response => response.text())
+        .then(data => {
+          if (data.includes("https://")) {
+            displayUrl(data);
+          } else {
+            alert("Error uploading to Catbox.");
+          }
+        })
+        .catch(() => alert("Error uploading to Catbox."));
     }
 
     function displayUrl(url) {
-      const container = document.querySelector(".url-container");
-      const imageUrl = document.getElementById("imageUrl");
-      imageUrl.value = url;
-      container.style.display = "flex";
+      const urlContainer = document.getElementById("urlContainer");
+      const imageUrlInput = document.getElementById("imageUrl");
+      imageUrlInput.value = url;
+      urlContainer.style.display = "flex";
     }
 
     function copyUrl() {
-      const imageUrl = document.getElementById("imageUrl");
-      imageUrl.select();
+      const imageUrlInput = document.getElementById("imageUrl");
+      imageUrlInput.select();
       document.execCommand("copy");
       alert("URL copied to clipboard!");
     }
